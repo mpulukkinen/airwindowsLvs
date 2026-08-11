@@ -1,10 +1,15 @@
 name: LVS Plugins - Windows Build
 
-# Temporarily manual-only while the VST3 suite is under active development.
-# This prevents every implementation commit from generating a failed-build
-# notification. Re-enable push/pull_request triggers once the validator is clean.
+# Development-safe trigger: source commits do not auto-run this workflow while
+# the suite is being assembled. Touch lvs-plugins/.ci-trigger for one deliberate
+# validation run. Normal push/PR CI is restored once the suite is green.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - lvs-essential-plugins
+    paths:
+      - 'lvs-plugins/.ci-trigger'
 
 permissions:
   contents: read
