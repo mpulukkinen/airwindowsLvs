@@ -1,13 +1,17 @@
 name: LVS Plugins - Windows Build
 
-# Temporary development-safe trigger. This workflow lives on the default branch
-# so PR validation is reliable, but it only runs when lvs-plugins/.ci-trigger is
-# touched. The feature PR will replace this with normal source-path CI once green.
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'lvs-plugins/**'
+      - '.github/workflows/lvs-plugins-*.yml'
   pull_request:
     paths:
-      - 'lvs-plugins/.ci-trigger'
+      - 'lvs-plugins/**'
+      - '.github/workflows/lvs-plugins-*.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
