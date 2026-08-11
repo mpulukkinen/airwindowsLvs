@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vstgui-ui-description version="1">
+    <colors>
+        <color name="Background" rgba="#20242BFF"/>
+        <color name="Panel" rgba="#2B3039FF"/>
+        <color name="Text" rgba="#F2F4F8FF"/>
+        <color name="Muted" rgba="#A9B0BCFF"/>
+        <color name="Accent" rgba="#74B9FFFF"/>
+        <color name="Frame" rgba="#11151AFF"/>
+    </colors>
+    <control-tags>
+        <control-tag name="Bypass" tag="100"/>
+        <control-tag name="Size" tag="4000"/>
+        <control-tag name="Mix" tag="4001"/>
+    </control-tags>
+    <template name="view" class="CViewContainer" origin="0, 0" size="360, 225" background-color="Background">
+        <view class="CTextLabel" origin="20, 14" size="300, 30" title="LVS Reverb" font-color="Text" transparent="true" font-size="20"/>
+        <view class="CTextLabel" origin="20, 43" size="310, 20" title="Airwindows Reverb DSP" font-color="Muted" transparent="true" font-size="11"/>
+
+        <view class="CKnob" origin="65, 82" size="76, 76" control-tag="Size" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="219, 82" size="76, 76" control-tag="Mix" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+
+        <view class="CTextLabel" origin="58, 162" size="90, 22" title="Size" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="212, 162" size="90, 22" title="Mix" font-color="Text" transparent="true" text-alignment="center"/>
+
+        <view class="CCheckBox" origin="245, 194" size="95, 22" title="Bypass" control-tag="Bypass" font-color="Muted"/>
+    </template>
+</vstgui-ui-description>

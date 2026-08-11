@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vstgui-ui-description version="1">
+    <colors>
+        <color name="Background" rgba="#20242BFF"/>
+        <color name="Panel" rgba="#2B3039FF"/>
+        <color name="Text" rgba="#F2F4F8FF"/>
+        <color name="Muted" rgba="#A9B0BCFF"/>
+        <color name="Accent" rgba="#74B9FFFF"/>
+        <color name="Frame" rgba="#11151AFF"/>
+    </colors>
+    <control-tags>
+        <control-tag name="Bypass" tag="100"/>
+        <control-tag name="High" tag="1000"/>
+        <control-tag name="HighMid" tag="1001"/>
+        <control-tag name="LowMid" tag="1002"/>
+        <control-tag name="Bass" tag="1003"/>
+    </control-tags>
+    <template name="view" class="CViewContainer" origin="0, 0" size="560, 230" background-color="Background">
+        <view class="CTextLabel" origin="20, 14" size="300, 30" title="LVS Equalizer" font-color="Text" transparent="true" font-size="20"/>
+        <view class="CTextLabel" origin="20, 43" size="420, 20" title="Airwindows PearLiteEQ DSP" font-color="Muted" transparent="true" font-size="11"/>
+
+        <view class="CKnob" origin="35, 82" size="70, 70" control-tag="Bass" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="165, 82" size="70, 70" control-tag="LowMid" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="295, 82" size="70, 70" control-tag="HighMid" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="425, 82" size="70, 70" control-tag="High" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+
+        <view class="CTextLabel" origin="30, 158" size="80, 22" title="Bass" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="150, 158" size="100, 22" title="Low Mid" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="280, 158" size="100, 22" title="High Mid" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="420, 158" size="80, 22" title="High" font-color="Text" transparent="true" text-alignment="center"/>
+
+        <view class="CCheckBox" origin="445, 195" size="95, 22" title="Bypass" control-tag="Bypass" font-color="Muted"/>
+    </template>
+</vstgui-ui-description>

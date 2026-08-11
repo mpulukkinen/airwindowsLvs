@@ -1,0 +1,69 @@
+name: LVS Plugins - Windows Release
+
+on:
+  push:
+    tags:
+      - 'lvs-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows-x64:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: >-
+          cmake -S lvs-plugins -B build/lvs-plugins
+          -G "Visual Studio 17 2022" -A x64
+          -DSMTG_CREATE_PLUGIN_LINK=OFF
+
+      - name: Build Release
+        run: >-
+          cmake --build build/lvs-plugins --config Release
+          --target LVSEqualizer LVSCompressor LVSDelay LVSReverb --parallel
+
+      - name: Package VST3 suite
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/package | Out-Null
+          $names = @(
+            'LVSEqualizer.vst3',
+            'LVSCompressor.vst3',
+            'LVSDelay.vst3',
+            'LVSReverb.vst3'
+          )
+          foreach ($name in $names) {
+            $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
+            if (-not $plugin) { throw "$name was not produced" }
+            Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
+          }
+
+          Copy-Item -Path lvs-plugins/THIRD_PARTY_NOTICES.md -Destination dist/package
+          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Essentials-Windows-x64.zip -Force
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LVS-Essentials-Windows-x64
+          path: dist/LVS-Essentials-Windows-x64.zip
+          if-no-files-found: error
+
+      - name: Create or update GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag dist/LVS-Essentials-Windows-x64.zip --clobber
+          } else {
+            gh release create $tag dist/LVS-Essentials-Windows-x64.zip --generate-notes --title "LVS Essentials $tag"
+          }
