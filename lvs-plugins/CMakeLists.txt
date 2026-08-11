@@ -20,8 +20,9 @@ include(FetchContent)
 FetchContent_Declare(
     vst3sdk
     GIT_REPOSITORY https://github.com/steinbergmedia/vst3sdk.git
-    GIT_TAG master
-    GIT_SHALLOW TRUE
+    # Pin the exact VST 3.8.0-era revision validated by CI so upstream changes
+    # cannot silently alter or break an otherwise unchanged LVS build.
+    GIT_TAG 58f8da7936800732561402d7936584ca4505de07
 )
 FetchContent_MakeAvailable(vst3sdk)
 smtg_enable_vst3_sdk()
