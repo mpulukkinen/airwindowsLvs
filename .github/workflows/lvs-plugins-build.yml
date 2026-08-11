@@ -37,8 +37,8 @@ jobs:
       - name: Collect VST3 bundle
         shell: pwsh
         run: |
-          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVS-Equalizer.vst3' | Select-Object -First 1
-          if (-not $plugin) { throw 'LVS-Equalizer.vst3 was not produced' }
+          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVSEqualizer.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw 'LVSEqualizer.vst3 was not produced' }
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           Copy-Item -Path $plugin.FullName -Destination dist -Recurse
           Write-Host "Collected $($plugin.FullName)"
@@ -47,5 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: LVS-Equalizer-Windows-x64
-          path: dist/LVS-Equalizer.vst3
+          path: dist/LVSEqualizer.vst3
           if-no-files-found: error
