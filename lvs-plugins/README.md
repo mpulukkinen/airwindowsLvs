@@ -55,6 +55,8 @@ The product names reported to VST3 hosts are `LVS Equalizer`, `LVS Compressor`, 
 
 `.github/workflows/lvs-plugins-build.yml` builds and validates the Windows x64 suite for pull requests that touch the plugin project, and again after changes land on `master`.
 
+For same-repository pull requests, a successful build also packages the exact test ZIP and publishes/updates a GitHub pre-release tagged `lvs-v0.1.0-pr<PR number>-test`. This gives reviewers a ready-to-download Windows bundle without requiring a local CMake or Visual Studio setup. For PR #1, the test tag is `lvs-v0.1.0-pr1-test`.
+
 `.github/workflows/lvs-plugins-release.yml` builds the same four plugins for tags matching `lvs-v*`, packages them with the third-party notices into `LVS-Essentials-Windows-x64.zip`, and creates or updates the matching GitHub Release.
 
 Example release tag:
