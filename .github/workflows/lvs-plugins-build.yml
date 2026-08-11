@@ -1,8 +1,8 @@
 name: LVS Plugins - Windows Build
 
-# Development-safe trigger: source commits do not auto-run this workflow while
-# the suite is being assembled. Touch lvs-plugins/.ci-trigger for one deliberate
-# PR validation run. Normal push/PR CI is restored once the suite is green.
+# Temporary development-safe trigger. This workflow lives on the default branch
+# so PR validation is reliable, but it only runs when lvs-plugins/.ci-trigger is
+# touched. The feature PR will replace this with normal source-path CI once green.
 on:
   workflow_dispatch:
   pull_request:
@@ -45,7 +45,6 @@ jobs:
             $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
             if (-not $plugin) { throw "$name was not produced" }
             Copy-Item -Path $plugin.FullName -Destination dist -Recurse
-            Write-Host "Collected $($plugin.FullName)"
           }
 
       - name: Upload Windows VST3 suite
