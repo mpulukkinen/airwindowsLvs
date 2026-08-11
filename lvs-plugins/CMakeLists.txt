@@ -2,35 +2,55 @@ cmake_minimum_required(VERSION 3.22)
 
 project(LVSEssentialPlugins VERSION 0.1.0 LANGUAGES CXX)
 
+if(NOT WIN32)
+    message(FATAL_ERROR "LVS Essential Plugins currently support Windows only")
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Stage 1 builds the reusable DSP layer without requiring any plugin SDK.
-# Turn this on once the first VST3 wrapper target is added.
-option(LVS_ENABLE_VST3 "Build LVS VST3 plugin targets" OFF)
+# Avoid requiring administrator rights or developer-mode symlink privileges.
+set(SMTG_CREATE_PLUGIN_LINK OFF CACHE BOOL "" FORCE)
+set(SMTG_ENABLE_VST3_PLUGIN_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SMTG_ENABLE_VST3_HOSTING_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(SMTG_ENABLE_VSTGUI_SUPPORT ON CACHE BOOL "" FORCE)
+
+include(FetchContent)
+FetchContent_Declare(
+    vst3sdk
+    GIT_REPOSITORY https://github.com/steinbergmedia/vst3sdk.git
+    GIT_TAG master
+    GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(vst3sdk)
+smtg_enable_vst3_sdk()
 
 add_library(lvs_plugin_common STATIC
     common/LvsAudioProcessor.cpp
-    dsp/PearLiteEqDsp.cpp
 )
-
 target_include_directories(lvs_plugin_common PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/common
     ${CMAKE_CURRENT_SOURCE_DIR}/dsp
 )
-
 target_compile_features(lvs_plugin_common PUBLIC cxx_std_20)
 
-if(LVS_ENABLE_VST3)
-    set(VST3_SDK_ROOT "" CACHE PATH "Path to Steinberg VST3 SDK")
+add_library(lvs_airwindows_dsp STATIC
+    dsp/PearLiteEqDsp.cpp
+)
+target_include_directories(lvs_airwindows_dsp PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/dsp
+)
+target_link_libraries(lvs_airwindows_dsp PUBLIC lvs_plugin_common)
+target_compile_features(lvs_airwindows_dsp PUBLIC cxx_std_20)
 
-    if(NOT VST3_SDK_ROOT)
-        message(FATAL_ERROR "Set VST3_SDK_ROOT to a VST3 SDK checkout")
-    endif()
+option(LVS_BUILD_EQ "Build LVS Equalizer" ON)
+option(LVS_BUILD_COMPRESSOR "Build LVS Compressor" OFF)
+option(LVS_BUILD_DELAY "Build LVS Delay" OFF)
+option(LVS_BUILD_REVERB "Build LVS Reverb" OFF)
+option(LVS_BUILD_LIMITER "Build LVS Limiter" OFF)
 
-    add_subdirectory("${VST3_SDK_ROOT}" "${CMAKE_BINARY_DIR}/vst3sdk")
-
-    # Individual plugin targets will be added here as their processor/controller
-    # and native editor implementations land.
+if(LVS_BUILD_EQ)
+    add_subdirectory(plugins/Equalizer)
 endif()
