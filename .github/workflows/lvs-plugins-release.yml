@@ -24,13 +24,20 @@ jobs:
           -DSMTG_CREATE_PLUGIN_LINK=OFF
 
       - name: Build Release
-        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer LVSCompressor --parallel
+        run: >-
+          cmake --build build/lvs-plugins --config Release
+          --target LVSEqualizer LVSCompressor LVSDelay LVSReverb --parallel
 
       - name: Package VST3 suite
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist/package | Out-Null
-          $names = @('LVSEqualizer.vst3', 'LVSCompressor.vst3')
+          $names = @(
+            'LVSEqualizer.vst3',
+            'LVSCompressor.vst3',
+            'LVSDelay.vst3',
+            'LVSReverb.vst3'
+          )
           foreach ($name in $names) {
             $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
             if (-not $plugin) { throw "$name was not produced" }
