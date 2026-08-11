@@ -23,6 +23,15 @@ tresult PLUGIN_API CompressorProcessor::initialize(FUnknown* context) {
     return kResultOk;
 }
 
+tresult PLUGIN_API CompressorProcessor::setBusArrangements(Vst::SpeakerArrangement* inputs, int32 numIns,
+                                                            Vst::SpeakerArrangement* outputs, int32 numOuts) {
+    if (numIns != 1 || numOuts != 1 || !inputs || !outputs ||
+        inputs[0] != Vst::SpeakerArr::kStereo || outputs[0] != Vst::SpeakerArr::kStereo)
+        return kResultFalse;
+
+    return AudioEffect::setBusArrangements(inputs, numIns, outputs, numOuts);
+}
+
 tresult PLUGIN_API CompressorProcessor::setupProcessing(Vst::ProcessSetup& setup) {
     const auto result = AudioEffect::setupProcessing(setup);
     if (result == kResultOk) {
@@ -85,7 +94,7 @@ tresult PLUGIN_API CompressorProcessor::process(Vst::ProcessData& data) {
 
     auto& input = data.inputs[0];
     auto& output = data.outputs[0];
-    if (input.numChannels < 2 || output.numChannels < 2)
+    if (input.numChannels != 2 || output.numChannels != 2)
         return kResultFalse;
 
     float* inL = input.channelBuffers32[0];
