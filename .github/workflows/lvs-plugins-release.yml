@@ -29,8 +29,8 @@ jobs:
       - name: Package VST3
         shell: pwsh
         run: |
-          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVS-Equalizer.vst3' | Select-Object -First 1
-          if (-not $plugin) { throw 'LVS-Equalizer.vst3 was not produced' }
+          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVSEqualizer.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw 'LVSEqualizer.vst3 was not produced' }
 
           New-Item -ItemType Directory -Force -Path dist/package | Out-Null
           Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
