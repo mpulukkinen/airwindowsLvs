@@ -23,6 +23,15 @@ tresult PLUGIN_API EqualizerProcessor::initialize(FUnknown* context) {
     return kResultOk;
 }
 
+tresult PLUGIN_API EqualizerProcessor::setBusArrangements(Vst::SpeakerArrangement* inputs, int32 numIns,
+                                                           Vst::SpeakerArrangement* outputs, int32 numOuts) {
+    if (numIns != 1 || numOuts != 1 || !inputs || !outputs ||
+        inputs[0] != Vst::SpeakerArr::kStereo || outputs[0] != Vst::SpeakerArr::kStereo)
+        return kResultFalse;
+
+    return AudioEffect::setBusArrangements(inputs, numIns, outputs, numOuts);
+}
+
 tresult PLUGIN_API EqualizerProcessor::setupProcessing(Vst::ProcessSetup& setup) {
     const auto result = AudioEffect::setupProcessing(setup);
     if (result == kResultOk) {
@@ -87,7 +96,7 @@ tresult PLUGIN_API EqualizerProcessor::process(Vst::ProcessData& data) {
 
     auto& input = data.inputs[0];
     auto& output = data.outputs[0];
-    if (input.numChannels < 2 || output.numChannels < 2)
+    if (input.numChannels != 2 || output.numChannels != 2)
         return kResultFalse;
 
     float* inL = input.channelBuffers32[0];
@@ -103,9 +112,8 @@ tresult PLUGIN_API EqualizerProcessor::process(Vst::ProcessData& data) {
     if (outR != inR)
         std::memcpy(outR, inR, bytes);
 
-    if (!bypass_) {
+    if (!bypass_)
         dsp_.process({outL, outR, static_cast<std::uint32_t>(data.numSamples)});
-    }
 
     output.silenceFlags = input.silenceFlags;
     return kResultOk;
