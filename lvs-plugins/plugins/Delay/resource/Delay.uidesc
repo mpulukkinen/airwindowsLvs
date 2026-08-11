@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vstgui-ui-description version="1">
+    <colors>
+        <color name="Background" rgba="#20242BFF"/>
+        <color name="Panel" rgba="#2B3039FF"/>
+        <color name="Text" rgba="#F2F4F8FF"/>
+        <color name="Muted" rgba="#A9B0BCFF"/>
+        <color name="Accent" rgba="#74B9FFFF"/>
+        <color name="Frame" rgba="#11151AFF"/>
+    </colors>
+    <control-tags>
+        <control-tag name="Bypass" tag="100"/>
+        <control-tag name="Time" tag="3000"/>
+        <control-tag name="Feedback" tag="3001"/>
+        <control-tag name="Tone" tag="3002"/>
+        <control-tag name="Flutter" tag="3003"/>
+        <control-tag name="Mix" tag="3004"/>
+    </control-tags>
+    <template name="view" class="CViewContainer" origin="0, 0" size="620, 240" background-color="Background">
+        <view class="CTextLabel" origin="20, 14" size="300, 30" title="LVS Delay" font-color="Text" transparent="true" font-size="20"/>
+        <view class="CTextLabel" origin="20, 43" size="380, 20" title="Airwindows TapeDelay2 DSP" font-color="Muted" transparent="true" font-size="11"/>
+
+        <view class="CKnob" origin="28, 82" size="72, 72" control-tag="Time" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="150, 82" size="72, 72" control-tag="Feedback" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="272, 82" size="72, 72" control-tag="Tone" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="394, 82" size="72, 72" control-tag="Flutter" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+        <view class="CKnob" origin="516, 82" size="72, 72" control-tag="Mix" back-color="Panel" frame-color="Frame" value-color="Accent" corona-color="Accent"/>
+
+        <view class="CTextLabel" origin="18, 160" size="92, 22" title="Time" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="140, 160" size="92, 22" title="Feedback" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="262, 160" size="92, 22" title="Tone" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="384, 160" size="92, 22" title="Flutter" font-color="Text" transparent="true" text-alignment="center"/>
+        <view class="CTextLabel" origin="506, 160" size="92, 22" title="Mix" font-color="Text" transparent="true" text-alignment="center"/>
+
+        <view class="CCheckBox" origin="505, 205" size="95, 22" title="Bypass" control-tag="Bypass" font-color="Muted"/>
+    </template>
+</vstgui-ui-description>
