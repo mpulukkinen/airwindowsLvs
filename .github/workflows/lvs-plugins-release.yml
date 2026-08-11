@@ -1,0 +1,60 @@
+name: LVS Plugins - Windows Release
+
+on:
+  push:
+    tags:
+      - 'lvs-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows-x64:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: >-
+          cmake -S lvs-plugins -B build/lvs-plugins
+          -G "Visual Studio 17 2022" -A x64
+          -DSMTG_CREATE_PLUGIN_LINK=OFF
+
+      - name: Build Release
+        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer --parallel
+
+      - name: Package VST3
+        shell: pwsh
+        run: |
+          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVS Equalizer.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw 'LVS Equalizer.vst3 was not produced' }
+
+          New-Item -ItemType Directory -Force -Path dist/package | Out-Null
+          Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
+          Copy-Item -Path lvs-plugins/THIRD_PARTY_NOTICES.md -Destination dist/package -ErrorAction SilentlyContinue
+
+          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Equalizer-Windows-x64.zip -Force
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LVS-Equalizer-Windows-x64
+          path: dist/LVS-Equalizer-Windows-x64.zip
+          if-no-files-found: error
+
+      - name: Create or update GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag dist/LVS-Equalizer-Windows-x64.zip --clobber
+          } else {
+            gh release create $tag dist/LVS-Equalizer-Windows-x64.zip --generate-notes --title "LVS Essentials $tag"
+          }
