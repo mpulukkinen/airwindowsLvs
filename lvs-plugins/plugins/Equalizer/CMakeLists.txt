@@ -28,9 +28,6 @@ smtg_target_add_plugin_resources(LVSEqualizer
         resource/Equalizer.uidesc
 )
 
-# Keep the bundle filename free of spaces because Steinberg's resource-copy
-# helper treats the bundle path as a command argument. The VST-visible product
-# name remains "LVS Equalizer" in EqualizerEntry.cpp.
-set_target_properties(LVSEqualizer PROPERTIES
-    OUTPUT_NAME "LVS-Equalizer"
-)
+# Keep the physical bundle name identical to the CMake target. Steinberg's
+# moduleinfotool and validator derive the module binary path from that name.
+# The VST-visible product name remains "LVS Equalizer" in EqualizerEntry.cpp.
