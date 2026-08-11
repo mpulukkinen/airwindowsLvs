@@ -32,20 +32,25 @@ jobs:
           -DSMTG_CREATE_PLUGIN_LINK=OFF
 
       - name: Build Release
-        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer --parallel
+        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer LVSCompressor --parallel
 
-      - name: Collect VST3 bundle
+      - name: Collect VST3 bundles
         shell: pwsh
         run: |
-          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVSEqualizer.vst3' | Select-Object -First 1
-          if (-not $plugin) { throw 'LVSEqualizer.vst3 was not produced' }
           New-Item -ItemType Directory -Force -Path dist | Out-Null
-          Copy-Item -Path $plugin.FullName -Destination dist -Recurse
-          Write-Host "Collected $($plugin.FullName)"
+          $names = @('LVSEqualizer.vst3', 'LVSCompressor.vst3')
+          foreach ($name in $names) {
+            $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
+            if (-not $plugin) { throw "$name was not produced" }
+            Copy-Item -Path $plugin.FullName -Destination dist -Recurse
+            Write-Host "Collected $($plugin.FullName)"
+          }
 
-      - name: Upload Windows VST3
+      - name: Upload Windows VST3 suite
         uses: actions/upload-artifact@v4
         with:
-          name: LVS-Equalizer-Windows-x64
-          path: dist/LVSEqualizer.vst3
+          name: LVS-Essentials-Windows-x64
+          path: |
+            dist/LVSEqualizer.vst3
+            dist/LVSCompressor.vst3
           if-no-files-found: error
