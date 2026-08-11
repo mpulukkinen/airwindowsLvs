@@ -6,15 +6,14 @@ on:
       - master
     paths:
       - 'lvs-plugins/**'
-      - '.github/workflows/lvs-plugins-*.yml'
   pull_request:
     paths:
       - 'lvs-plugins/**'
-      - '.github/workflows/lvs-plugins-*.yml'
+      - '.github/workflows/lvs-plugins-build.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-windows-x64:
@@ -35,10 +34,10 @@ jobs:
           cmake --build build/lvs-plugins --config Release
           --target LVSEqualizer LVSCompressor LVSDelay LVSReverb --parallel
 
-      - name: Collect VST3 bundles
+      - name: Package Windows VST3 suite
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          New-Item -ItemType Directory -Force -Path dist/package | Out-Null
           $names = @(
             'LVSEqualizer.vst3',
             'LVSCompressor.vst3',
@@ -48,16 +47,35 @@ jobs:
           foreach ($name in $names) {
             $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
             if (-not $plugin) { throw "$name was not produced" }
-            Copy-Item -Path $plugin.FullName -Destination dist -Recurse
+            Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
           }
+
+          Copy-Item -Path lvs-plugins/THIRD_PARTY_NOTICES.md -Destination dist/package
+          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Essentials-Windows-x64.zip -Force
 
       - name: Upload Windows VST3 suite
         uses: actions/upload-artifact@v4
         with:
           name: LVS-Essentials-Windows-x64
-          path: |
-            dist/LVSEqualizer.vst3
-            dist/LVSCompressor.vst3
-            dist/LVSDelay.vst3
-            dist/LVSReverb.vst3
+          path: dist/LVS-Essentials-Windows-x64.zip
           if-no-files-found: error
+
+      - name: Publish PR test pre-release
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "lvs-v0.1.0-pr${{ github.event.pull_request.number }}-test"
+          $sha = "${{ github.event.pull_request.head.sha }}"
+          $title = "LVS Essentials PR #${{ github.event.pull_request.number }} test"
+          $notes = "Automated Windows x64 test build from PR #${{ github.event.pull_request.number }} at commit $sha. Pre-release for manual LVS/VST3 smoke testing only."
+
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh api --method PATCH "repos/${{ github.repository }}/git/refs/tags/$tag" -f sha="$sha" -F force=true
+            gh release upload $tag dist/LVS-Essentials-Windows-x64.zip --clobber
+            gh release edit $tag --prerelease --title $title --notes $notes
+          } else {
+            gh release create $tag dist/LVS-Essentials-Windows-x64.zip --target $sha --prerelease --title $title --notes $notes
+          }
