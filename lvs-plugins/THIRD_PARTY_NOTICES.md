@@ -1,10 +1,19 @@
 # Third-party notices
 
-LVS Essential Plugins include or derive from third-party open-source software.
+LVS Essential Plugins include or adapt third-party open-source software. The LVS VST3 wrappers, parameter/state mapping and editor definitions are separate from the third-party DSP implementations listed below.
 
 ## Airwindows
 
-The DSP algorithms adapted in this project are derived from Airwindows by Chris Johnson.
+Airwindows is by Chris Johnson and is distributed under the MIT License.
+
+The LVS Essential Plugins currently use these Airwindows algorithms:
+
+- `PearLiteEQ` for **LVS Equalizer**
+- `ButterComp2` for **LVS Compressor**
+- `TapeDelay2` for **LVS Delay**
+- `Reverb` for **LVS Reverb**
+
+`TapeDelay2` and `Reverb` compile selected original Airwindows source files as private DSP implementation behind the LVS compatibility adapter. No legacy Airwindows VST2 plugin binary or VST2 ABI is redistributed by the LVS VST3 targets.
 
 MIT License
 
@@ -17,6 +26,8 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ## Steinberg VST 3 SDK
+
+The LVS plugin wrappers and editors use the Steinberg VST 3 SDK and VSTGUI support supplied with the SDK.
 
 MIT License
 
