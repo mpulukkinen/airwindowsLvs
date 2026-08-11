@@ -1,0 +1,51 @@
+name: LVS Plugins - Windows Build
+
+on:
+  push:
+    branches:
+      - master
+      - lvs-essential-plugins
+    paths:
+      - 'lvs-plugins/**'
+      - '.github/workflows/lvs-plugins-*.yml'
+  pull_request:
+    paths:
+      - 'lvs-plugins/**'
+      - '.github/workflows/lvs-plugins-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-x64:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: >-
+          cmake -S lvs-plugins -B build/lvs-plugins
+          -G "Visual Studio 17 2022" -A x64
+          -DSMTG_CREATE_PLUGIN_LINK=OFF
+
+      - name: Build Release
+        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer --parallel
+
+      - name: Collect VST3 bundle
+        shell: pwsh
+        run: |
+          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVS Equalizer.vst3' | Select-Object -First 1
+          if (-not $plugin) { throw 'LVS Equalizer.vst3 was not produced' }
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item -Path $plugin.FullName -Destination dist -Recurse
+          Write-Host "Collected $($plugin.FullName)"
+
+      - name: Upload Windows VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: LVS-Equalizer-Windows-x64
+          path: dist/LVS Equalizer.vst3
+          if-no-files-found: error
