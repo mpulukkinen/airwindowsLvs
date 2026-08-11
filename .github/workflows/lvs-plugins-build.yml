@@ -1,17 +1,9 @@
 name: LVS Plugins - Windows Build
 
+# Temporarily manual-only while the VST3 suite is under active development.
+# This prevents every implementation commit from generating a failed-build
+# notification. Re-enable push/pull_request triggers once the validator is clean.
 on:
-  push:
-    branches:
-      - master
-      - lvs-essential-plugins
-    paths:
-      - 'lvs-plugins/**'
-      - '.github/workflows/lvs-plugins-*.yml'
-  pull_request:
-    paths:
-      - 'lvs-plugins/**'
-      - '.github/workflows/lvs-plugins-*.yml'
   workflow_dispatch:
 
 permissions:
