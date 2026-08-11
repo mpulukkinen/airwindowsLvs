@@ -2,12 +2,10 @@ name: LVS Plugins - Windows Build
 
 # Development-safe trigger: source commits do not auto-run this workflow while
 # the suite is being assembled. Touch lvs-plugins/.ci-trigger for one deliberate
-# validation run. Normal push/PR CI is restored once the suite is green.
+# PR validation run. Normal push/PR CI is restored once the suite is green.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - lvs-essential-plugins
+  pull_request:
     paths:
       - 'lvs-plugins/.ci-trigger'
 
