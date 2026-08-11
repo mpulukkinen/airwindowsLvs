@@ -24,25 +24,27 @@ jobs:
           -DSMTG_CREATE_PLUGIN_LINK=OFF
 
       - name: Build Release
-        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer --parallel
+        run: cmake --build build/lvs-plugins --config Release --target LVSEqualizer LVSCompressor --parallel
 
-      - name: Package VST3
+      - name: Package VST3 suite
         shell: pwsh
         run: |
-          $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVSEqualizer.vst3' | Select-Object -First 1
-          if (-not $plugin) { throw 'LVSEqualizer.vst3 was not produced' }
-
           New-Item -ItemType Directory -Force -Path dist/package | Out-Null
-          Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
-          Copy-Item -Path lvs-plugins/THIRD_PARTY_NOTICES.md -Destination dist/package -ErrorAction SilentlyContinue
+          $names = @('LVSEqualizer.vst3', 'LVSCompressor.vst3')
+          foreach ($name in $names) {
+            $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
+            if (-not $plugin) { throw "$name was not produced" }
+            Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
+          }
 
-          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Equalizer-Windows-x64.zip -Force
+          Copy-Item -Path lvs-plugins/THIRD_PARTY_NOTICES.md -Destination dist/package
+          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Essentials-Windows-x64.zip -Force
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LVS-Equalizer-Windows-x64
-          path: dist/LVS-Equalizer-Windows-x64.zip
+          name: LVS-Essentials-Windows-x64
+          path: dist/LVS-Essentials-Windows-x64.zip
           if-no-files-found: error
 
       - name: Create or update GitHub Release
@@ -54,7 +56,7 @@ jobs:
           $tag = "${{ github.ref_name }}"
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag dist/LVS-Equalizer-Windows-x64.zip --clobber
+            gh release upload $tag dist/LVS-Essentials-Windows-x64.zip --clobber
           } else {
-            gh release create $tag dist/LVS-Equalizer-Windows-x64.zip --generate-notes --title "LVS Essentials $tag"
+            gh release create $tag dist/LVS-Essentials-Windows-x64.zip --generate-notes --title "LVS Essentials $tag"
           }
