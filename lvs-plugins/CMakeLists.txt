@@ -37,6 +37,7 @@ target_compile_features(lvs_plugin_common PUBLIC cxx_std_20)
 
 add_library(lvs_airwindows_dsp STATIC
     dsp/PearLiteEqDsp.cpp
+    dsp/ButterComp2Dsp.cpp
 )
 target_include_directories(lvs_airwindows_dsp PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/common
@@ -46,11 +47,15 @@ target_link_libraries(lvs_airwindows_dsp PUBLIC lvs_plugin_common)
 target_compile_features(lvs_airwindows_dsp PUBLIC cxx_std_20)
 
 option(LVS_BUILD_EQ "Build LVS Equalizer" ON)
-option(LVS_BUILD_COMPRESSOR "Build LVS Compressor" OFF)
+option(LVS_BUILD_COMPRESSOR "Build LVS Compressor" ON)
 option(LVS_BUILD_DELAY "Build LVS Delay" OFF)
 option(LVS_BUILD_REVERB "Build LVS Reverb" OFF)
 option(LVS_BUILD_LIMITER "Build LVS Limiter" OFF)
 
 if(LVS_BUILD_EQ)
     add_subdirectory(plugins/Equalizer)
+endif()
+
+if(LVS_BUILD_COMPRESSOR)
+    add_subdirectory(plugins/Compressor)
 endif()
