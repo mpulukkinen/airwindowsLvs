@@ -1,19 +1,39 @@
 # Third-party notices
 
-LVS Essential Plugins include or adapt third-party open-source software. The LVS VST3 wrappers, parameter/state mapping and editor definitions are separate from the third-party DSP implementations listed below.
+LVS Audio Suite includes or adapts third-party open-source software. The LVS VST3 wrappers, parameter/state mapping, editor definitions and build integration are separate from the third-party DSP implementations listed below.
 
 ## Airwindows
 
 Airwindows is by Chris Johnson and is distributed under the MIT License.
 
-The LVS Essential Plugins currently use these Airwindows algorithms:
+The LVS Audio Suite currently uses these Airwindows algorithms:
 
 - `PearLiteEQ` for **LVS Equalizer**
 - `ButterComp2` for **LVS Compressor**
 - `TapeDelay2` for **LVS Delay**
 - `Reverb` for **LVS Reverb**
+- `Recurve` for **LVS Limiter**
+- `ADClip9` for **LVS Clipper**
+- `DeBess` for **LVS De-Esser**
+- `SoftGate` for **LVS Gate**
+- `StereoChorus` for **LVS Chorus**
+- `Wider` for **LVS Stereo Width**
+- `Density3` for **LVS Saturation**
+- `ToTape9` for **LVS Tape**
+- `StereoDoubler` for **LVS Doubler**
+- `BiquadDouble` for **LVS Filter**
+- `Tremolo` for **LVS Tremolo**
+- `AutoPan` for **LVS Auto Pan**
+- `Air3` for **LVS Exciter**
+- `Drive` for **LVS Distortion**
+- `Podcast` for **LVS Vocal Leveler**
+- `StereoEnsemble` for **LVS Ensemble**
+- `PitchDelay` for **LVS Pitch Delay**
+- `RingModulator` for **LVS Ring Modulator**
+- `DeRez4` for **LVS Lo-Fi**
+- `FireAmp` for **LVS Guitar Amp**
 
-`TapeDelay2` and `Reverb` compile selected original Airwindows source files as private DSP implementation behind the LVS compatibility adapter. No legacy Airwindows VST2 plugin binary or VST2 ABI is redistributed by the LVS VST3 targets.
+Selected original Airwindows source files are compiled only as private DSP implementation behind the LVS compatibility adapters. No legacy Airwindows VST2 plugin binary or VST2 ABI is redistributed by the LVS VST3 targets.
 
 MIT License
 
