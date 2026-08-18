@@ -28,7 +28,7 @@ using LegacyParameterMapper = float (*)(double) noexcept;
 using LegacyFactory = AudioEffectX* (*)();
 
 struct LegacyParameterSpec {
-    const TChar* name;
+    const Vst::TChar* name;
     Vst::ParamID id;
     int32 legacyIndex;
     double defaultValue;
