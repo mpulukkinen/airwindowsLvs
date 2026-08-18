@@ -1,0 +1,10 @@
+#include "../../common/LegacyAirwindowsVst3.h"
+#include "Drive.h"
+#include "public.sdk/source/main/pluginfactory.h"
+namespace Steinberg::LVS { namespace { const FUID kProcessorUID(0x3D08C448,0xE8AC4734,0xFDD576C9,0xDA7E11E4); const FUID kControllerUID(0xC50C3DCA,0xB6CD00EC,0x8E959C20,0xC3AECC46); const LegacyParameterSpec kParameters[]={{STR16("Drive"),1000,0,0.2,0,LegacyParameterTarget::Legacy,mapDirect},{STR16("Highpass"),1001,1,0.0,0,LegacyParameterTarget::Legacy,mapDirect},{STR16("Output"),1002,2,1.0,0,LegacyParameterTarget::Legacy,mapDirect},{STR16("Mix"),1003,3,1.0,0,LegacyParameterTarget::Legacy,mapDirect}}; AudioEffectX* createLegacyEffect(){return new ::Drive(nullptr);} const LegacyPluginSpec kPluginSpec{&kControllerUID,kParameters,4,nullptr,0,&createLegacyEffect,"Distortion.uidesc"}; } class DistortionProcessor final:public LegacyEffectProcessor{public:DistortionProcessor():LegacyEffectProcessor(kPluginSpec){} static FUnknown* createInstance(void*){return static_cast<Vst::IAudioProcessor*>(new DistortionProcessor());}}; class DistortionController final:public LegacyEffectController{public:DistortionController():LegacyEffectController(kPluginSpec){} static FUnknown* createInstance(void*){return static_cast<Vst::IEditController*>(new DistortionController());}}; }
+#define stringPluginName "LVS Distortion"
+#define FULL_VERSION_STR "0.2.0"
+using namespace Steinberg; using namespace Steinberg::Vst; using namespace Steinberg::LVS; BEGIN_FACTORY_DEF("Lyric Video Studio","https://lyricvideo.studio","mailto:support@lyricvideo.studio")
+DEF_CLASS2(INLINE_UID_FROM_FUID(kProcessorUID),PClassInfo::kManyInstances,kVstAudioEffectClass,stringPluginName,Vst::kDistributable,"Fx|Distortion",FULL_VERSION_STR,kVstVersionString,DistortionProcessor::createInstance)
+DEF_CLASS2(INLINE_UID_FROM_FUID(kControllerUID),PClassInfo::kManyInstances,kVstComponentControllerClass,stringPluginName " Controller",0,"",FULL_VERSION_STR,kVstVersionString,DistortionController::createInstance)
+END_FACTORY
