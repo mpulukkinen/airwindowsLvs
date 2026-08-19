@@ -1,30 +1,58 @@
-# LVS Essential Plugins
+# LVS Audio Suite
 
-A small Windows VST3 effect suite for Lyric Video Studio, built around selected MIT-licensed Airwindows DSP algorithms with LVS-owned VST3 wrappers, automation/state handling, names and independent VSTGUI editors.
+A Windows x64 VST3 effect suite for **Lyric Video Studio**, built around selected MIT-licensed Airwindows DSP algorithms with LVS-owned VST3 identities, automation/state handling, parameter mapping and independent VSTGUI editors.
+
+Version 0.2.0 expands the original four essentials into a **24-plugin audio toolkit** for music, vocals, video production and creative sound design.
 
 ## Plugins
 
-| Plugin | DSP | Controls |
+| LVS plugin | Airwindows DSP | Main controls |
 | --- | --- | --- |
-| LVS Equalizer | Airwindows PearLiteEQ | High, High Mid, Low Mid, Bass |
-| LVS Compressor | Airwindows ButterComp2 | Compression, Output, Mix |
-| LVS Delay | Airwindows TapeDelay2 | Time, Feedback, Tone, Flutter, Mix |
-| LVS Reverb | Airwindows Reverb | Size, Mix |
+| **LVS Equalizer** | PearLiteEQ | High, High Mid, Low Mid, Bass |
+| **LVS Compressor** | ButterComp2 | Compression, Output, Mix |
+| **LVS Delay** | TapeDelay2 | Time, Feedback, Tone, Flutter, Mix |
+| **LVS Reverb** | Reverb | Size, Mix |
+| **LVS Limiter** | Recurve | Drive, Output, Mix |
+| **LVS Clipper** | ADClip9 | Boost, Match, Noise, Ceiling, Mode |
+| **LVS De-Esser** | DeBess | Intensity, Sharpness, Depth, Filter, Mode |
+| **LVS Gate** | SoftGate | Threshold, Darken, Silence |
+| **LVS Chorus** | StereoChorus | Speed, Depth, Mix |
+| **LVS Stereo Width** | Wider | Width, Center, Mix |
+| **LVS Saturation** | Density3 | Drive, Highpass, Output, Mix |
+| **LVS Tape** | ToTape9 | Input, Tilt, Shape, Flutter, Flutter Speed, Bias, Head Bump, Head Freq, Output |
+| **LVS Doubler** | StereoDoubler | Detune, Mix |
+| **LVS Filter** | BiquadDouble | Type, Frequency, Q, Mix / Invert |
+| **LVS Tremolo** | Tremolo | Speed, Depth |
+| **LVS Auto Pan** | AutoPan | Rate, Phase, Width, Mix |
+| **LVS Exciter** | Air3 | Air, Ground |
+| **LVS Distortion** | Drive | Drive, Highpass, Output, Mix |
+| **LVS Vocal Leveler** | Podcast | Boost, Mix |
+| **LVS Ensemble** | StereoEnsemble | Depth, Effect Level |
+| **LVS Pitch Delay** | PitchDelay | Time, Feedback, Tone, Resonance, Pitch, Mix |
+| **LVS Ring Modulator** | RingModulator | Frequency A, Frequency B, Soar, Mix |
+| **LVS Lo-Fi** | DeRez4 | Downsample, Brightness, Bass, Output |
+| **LVS Guitar Amp** | FireAmp | Gain, Tone, Output, Mix |
 
-All four plugins also expose a standard VST3 bypass parameter.
+Every plugin also exposes a standard VST3 bypass parameter.
 
 ## Design
 
-The public plugins are new LVS VST3 plugins. Airwindows is treated as the DSP implementation layer, not as the plugin identity or UI.
+The public plugins are **LVS VST3 plugins**. Airwindows supplies the DSP implementation layer, not the public plugin identity or UI.
 
-- `common/` contains shared host-independent LVS audio abstractions.
-- `dsp/` contains the LVS DSP adapters.
-- `legacy/audioeffectx.h` is a minimal private compatibility shim used only to compile selected original Airwindows VST2-era DSP sources. It does not expose or ship a VST2 plugin ABI.
-- `plugins/` contains the VST3 processor, controller, factory and editor for each LVS plugin.
+The original four plugins keep their existing processor/controller IDs for project compatibility. The expanded effects use a shared `LegacyAirwindowsVst3` adapter that provides:
 
-PearLiteEQ and ButterComp2 are adapted into host-independent DSP classes. TapeDelay2 and Reverb compile the original Airwindows processing sources behind the private compatibility layer so those larger algorithms remain close to upstream.
+- stable LVS VST3 component identities
+- automation and state persistence
+- explicit stereo-only bus negotiation
+- 32-bit floating-point processing
+- standard VST3 bypass
+- independent VSTGUI editor windows
+- optional LVS-side input/output gain and conventional wet/dry mixing
+- clean DSP reset when a plugin is activated
 
-The plugins currently accept stereo input/output and 32-bit floating-point audio processing. They intentionally reject mono bus negotiation rather than accepting a layout the DSP wrappers do not implement.
+`legacy/audioeffectx.h` is a minimal private compatibility shim used only to compile selected Airwindows VST2-era source as DSP implementation. **No VST2 plugin ABI or VST2 binary is shipped.**
+
+A few controls are intentionally made more intuitive at the LVS layer. For example, Delay and Pitch Delay expose time in the expected short-to-long direction, and effects that need it can use a conventional dry/wet crossfade instead of a send-style mix law.
 
 ## Build
 
@@ -33,43 +61,37 @@ Requirements:
 - Windows
 - Visual Studio 2022 with C++ desktop tools
 - CMake 3.22 or newer
-- Git, so CMake can fetch the Steinberg VST3 SDK
+- Git, so CMake can fetch the pinned Steinberg VST3 SDK revision
 
 From the repository root:
 
 ```powershell
 cmake -S lvs-plugins -B build/lvs-plugins -G "Visual Studio 17 2022" -A x64 -DSMTG_CREATE_PLUGIN_LINK=OFF
-cmake --build build/lvs-plugins --config Release --target LVSEqualizer LVSCompressor LVSDelay LVSReverb --parallel
+cmake --build build/lvs-plugins --config Release --parallel
 ```
 
-The resulting bundles are created under the CMake VST3 output directory as:
+The build produces **24 `LVS*.vst3` bundles**. The project intentionally fails configuration on non-Windows systems.
 
-- `LVSEqualizer.vst3`
-- `LVSCompressor.vst3`
-- `LVSDelay.vst3`
-- `LVSReverb.vst3`
+## CI and test releases
 
-The product names reported to VST3 hosts are `LVS Equalizer`, `LVS Compressor`, `LVS Delay` and `LVS Reverb`.
+`.github/workflows/lvs-plugins-build.yml` builds and validates the complete Windows x64 suite for plugin-related pull requests and for plugin changes landing on `master`.
 
-## CI and releases
+CI refuses to package a release unless it finds exactly **24 LVS VST3 bundles**. Same-repository pull requests also publish/update a downloadable test pre-release tagged:
 
-`.github/workflows/lvs-plugins-build.yml` builds and validates the Windows x64 suite for pull requests that touch the plugin project, and again after changes land on `master`.
-
-For same-repository pull requests, a successful build also packages the exact test ZIP and publishes/updates a GitHub pre-release tagged `lvs-v0.1.0-pr<PR number>-test`. This gives reviewers a ready-to-download Windows bundle without requiring a local CMake or Visual Studio setup. For PR #1, the test tag is `lvs-v0.1.0-pr1-test`.
-
-`.github/workflows/lvs-plugins-release.yml` builds the same four plugins for tags matching `lvs-v*`, packages them with the third-party notices into `LVS-Essentials-Windows-x64.zip`, and creates or updates the matching GitHub Release.
-
-Example release tag:
-
-```powershell
-git tag lvs-v0.1.0
-git push origin lvs-v0.1.0
+```text
+lvs-v0.2.0-pr<PR number>-test
 ```
+
+The test asset is `LVS-Audio-Suite-Windows-x64.zip`, allowing manual testing in Lyric Video Studio or another Windows VST3 host without setting up a local C++ build environment.
+
+`.github/workflows/lvs-plugins-release.yml` uses the same build/package checks for production tags matching `lvs-v*`.
 
 ## Validation
 
-The Windows GitHub Actions build runs Steinberg's VST3 validator as part of each plugin target. The first complete four-plugin validation passed all 47 validator tests for each plugin.
+The original four-plugin 0.1.0 suite passed Steinberg's VST3 validator with **47 tests passed, 0 failed per plugin** and was manually smoke-tested in Lyric Video Studio.
+
+The expanded 0.2.0 suite is validated through the same Windows GitHub Actions + Steinberg validator path before release.
 
 ## Licensing
 
-See `THIRD_PARTY_NOTICES.md` for the Airwindows and Steinberg VST3 SDK notices. LVS wrapper/editor code remains separate from the third-party DSP sources.
+See `THIRD_PARTY_NOTICES.md` for the Airwindows and Steinberg VST3 SDK notices and the exact Airwindows algorithms used by the suite.

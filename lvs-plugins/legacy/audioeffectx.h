@@ -56,6 +56,8 @@ public:
 
     virtual void processReplacing(float**, float**, VstInt32) {}
     virtual void processDoubleReplacing(double**, double**, VstInt32) {}
+    virtual void setParameter(VstInt32, float) {}
+    virtual float getParameter(VstInt32) { return 0.0f; }
 
     void setNumInputs(VstInt32) {}
     void setNumOutputs(VstInt32) {}
@@ -66,9 +68,12 @@ public:
     void setInitialDelay(VstInt32) {}
 
     float getSampleRate() const noexcept { return sampleRate_; }
-    void setSampleRate(float sampleRate) noexcept {
+    virtual void setSampleRate(float sampleRate) noexcept {
         sampleRate_ = sampleRate > 1.0f ? sampleRate : 44100.0f;
     }
+
+protected:
+    int getBlockSize() const noexcept { return 512; }
 
 private:
     float sampleRate_{44100.0f};

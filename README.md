@@ -1,8 +1,8 @@
-# Lyric Video Studio + LVS Essentials
+# Lyric Video Studio + LVS Audio Suite
 
 **A video editor for musicians, lyric videos, music videos, content creation and flexible AI-assisted workflows.**
 
-This repository is part of the [Lyric Video Studio](https://lyricvideo.studio/) ecosystem. It currently contains **LVS Essentials**, a small Windows VST3 audio-effect suite built for Lyric Video Studio using selected MIT-licensed [Airwindows](https://www.airwindows.com/) DSP algorithms behind new LVS-owned VST3 wrappers and plugin interfaces.
+This repository is part of the [Lyric Video Studio](https://lyricvideo.studio/) ecosystem. It contains the open-source **LVS Audio Suite**: a Windows VST3 collection built for Lyric Video Studio using selected MIT-licensed [Airwindows](https://www.airwindows.com/) DSP algorithms behind LVS-owned VST3 wrappers, parameter mapping and plugin interfaces.
 
 > **Looking for the video editor itself?**  
 > Visit **[lyricvideo.studio](https://lyricvideo.studio/)** or **[download / try Lyric Video Studio](https://lyricvideo.studio/buy/)**.
@@ -50,22 +50,50 @@ See the current feature list at **[lyricvideo.studio/features](https://lyricvide
 
 ---
 
-# LVS Essentials: Windows VST3 Audio Effects
+# LVS Audio Suite: 24 Windows VST3 Effects
 
-The open-source work in this repository adds a compact set of bread-and-butter audio effects with their own VST3 identities and independent plugin windows.
+The open-source work in this repository provides a practical audio toolkit with **24 separate VST3 effects**, their own LVS identities and independent plugin windows.
 
-| Plugin | Airwindows DSP | LVS controls |
-| --- | --- | --- |
-| **LVS Equalizer** | PearLiteEQ | High, High Mid, Low Mid, Bass |
-| **LVS Compressor** | ButterComp2 | Compression, Output, Mix |
-| **LVS Delay** | TapeDelay2 | Time, Feedback, Tone, Flutter, Mix |
-| **LVS Reverb** | Reverb | Size, Mix |
+### Essentials
 
-The goal is deliberately simple: provide useful everyday EQ, compression, delay and reverb instead of exposing hundreds of experimental parameters or requiring musicians to hunt for a separate VST bundle before editing audio in a video project.
+- **LVS Equalizer**: PearLiteEQ
+- **LVS Compressor**: ButterComp2
+- **LVS Delay**: TapeDelay2
+- **LVS Reverb**: Reverb
+- **LVS Limiter**: Recurve
+- **LVS Clipper**: ADClip9
+- **LVS De-Esser**: DeBess
+- **LVS Gate**: SoftGate
+
+### Tone, stereo and modulation
+
+- **LVS Chorus**: StereoChorus
+- **LVS Stereo Width**: Wider
+- **LVS Saturation**: Density3
+- **LVS Tape**: ToTape9
+- **LVS Doubler**: StereoDoubler
+- **LVS Filter**: BiquadDouble
+- **LVS Tremolo**: Tremolo
+- **LVS Auto Pan**: AutoPan
+- **LVS Exciter**: Air3
+
+### Vocals and creative effects
+
+- **LVS Distortion**: Drive
+- **LVS Vocal Leveler**: Podcast
+- **LVS Ensemble**: StereoEnsemble
+- **LVS Pitch Delay**: PitchDelay
+- **LVS Ring Modulator**: RingModulator
+- **LVS Lo-Fi**: DeRez4
+- **LVS Guitar Amp**: FireAmp
+
+The goal is straightforward: give musicians and video creators useful EQ, dynamics, vocal processing, stereo tools, modulation, tape/color effects and creative audio processing without requiring a hunt through unrelated plugin bundles.
+
+For the complete control list, build instructions, architecture and release automation, see **[`lvs-plugins/README.md`](lvs-plugins/README.md)**.
 
 ### Architecture
 
-The plugins are **new LVS VST3 plugins**. Airwindows is used as the DSP implementation layer, not as the public plugin identity or user interface.
+The plugins are **LVS VST3 plugins**. Airwindows is used as the DSP implementation layer, not as the public plugin identity or user interface.
 
 ```text
 VST3 host / Lyric Video Studio
@@ -79,11 +107,9 @@ VST3 host / Lyric Video Studio
     Airwindows algorithm
 ```
 
-This keeps stable LVS plugin identities, automation parameters, saved state and custom interfaces while allowing the underlying DSP implementation to remain clearly separated.
+This keeps stable LVS plugin identities, automation parameters, saved state and custom interfaces while separating the public plugin layer from the underlying DSP implementation.
 
-The current LVS Essentials builds are **Windows x64 VST3 only**.
-
-For build details, architecture notes and release automation, see [`lvs-plugins/README.md`](lvs-plugins/README.md).
+The current LVS Audio Suite builds are **Windows x64 VST3 only**.
 
 ---
 
@@ -91,7 +117,7 @@ For build details, architecture notes and release automation, see [`lvs-plugins/
 
 Lyric Video Studio itself is a commercial desktop application. This repository exists for the open-source audio-plugin components used around the application and for the third-party DSP code they build upon.
 
-The LVS Essentials wrappers, interfaces and build system are kept separate from the original Airwindows tree. Third-party license notices are included with the plugin project and release packages.
+The LVS wrappers, interfaces and build system are kept separate from the original Airwindows tree. Third-party license notices are included with the plugin project and release packages.
 
 If you arrived here while looking for the main application, its editor, AI integrations or plugin ecosystem, these are the useful starting points:
 
@@ -116,10 +142,10 @@ If you're creating a lyric video, music video, visualizer, AI-assisted video, Yo
 
 ## Licenses
 
-Airwindows DSP code used by LVS Essentials is MIT licensed. The Steinberg VST3 SDK used by the build is also distributed under its applicable MIT terms.
+Airwindows DSP code used by LVS Audio Suite is MIT licensed. The Steinberg VST3 SDK used by the build is also distributed under its applicable MIT terms.
 
-See [`lvs-plugins/THIRD_PARTY_NOTICES.md`](lvs-plugins/THIRD_PARTY_NOTICES.md) for the notices included with LVS Essentials.
+See [`lvs-plugins/THIRD_PARTY_NOTICES.md`](lvs-plugins/THIRD_PARTY_NOTICES.md) for the exact algorithms and license notices included with the suite.
 
 ---
 
-**Lyric Video Studio:** precise editing, fast lyric workflows, audio-reactive visuals, local generation, API integrations and repeatable AI workflows in one desktop editor.
+**Lyric Video Studio:** precise editing, fast lyric workflows, audio-reactive visuals, local generation, API integrations, repeatable AI workflows and practical audio processing in one desktop editor.

@@ -1,0 +1,10 @@
+#include "../../common/LegacyAirwindowsVst3.h"
+#include "RingModulator.h"
+#include "public.sdk/source/main/pluginfactory.h"
+namespace Steinberg::LVS { namespace { const FUID kProcessorUID(0xF303D9EF,0xD62AC9CD,0x9A8F5CFC,0x10776D29); const FUID kControllerUID(0xA1E9A3F7,0xAC5128B9,0x4A646282,0x96B9DC4C); const LegacyParameterSpec kParameters[]={{STR16("Frequency A"),1000,0,0.5,0,LegacyParameterTarget::Legacy,mapDirect},{STR16("Frequency B"),1001,1,0.5,0,LegacyParameterTarget::Legacy,mapDirect},{STR16("Soar"),1002,2,0.0,0,LegacyParameterTarget::Legacy,mapDirect},{STR16("Mix"),1003,3,0.0,0,LegacyParameterTarget::Legacy,mapDirect}}; AudioEffectX* createLegacyEffect(){return new ::RingModulator(nullptr);} const LegacyPluginSpec kPluginSpec{&kControllerUID,kParameters,4,nullptr,0,&createLegacyEffect,"RingMod.uidesc"}; } class RingModProcessor final:public LegacyEffectProcessor{public:RingModProcessor():LegacyEffectProcessor(kPluginSpec){} static FUnknown* createInstance(void*){return static_cast<Vst::IAudioProcessor*>(new RingModProcessor());}}; class RingModController final:public LegacyEffectController{public:RingModController():LegacyEffectController(kPluginSpec){} static FUnknown* createInstance(void*){return static_cast<Vst::IEditController*>(new RingModController());}}; }
+#define stringPluginName "LVS Ring Modulator"
+#define FULL_VERSION_STR "0.2.0"
+using namespace Steinberg; using namespace Steinberg::Vst; using namespace Steinberg::LVS; BEGIN_FACTORY_DEF("Lyric Video Studio","https://lyricvideo.studio","mailto:support@lyricvideo.studio")
+DEF_CLASS2(INLINE_UID_FROM_FUID(kProcessorUID),PClassInfo::kManyInstances,kVstAudioEffectClass,stringPluginName,Vst::kDistributable,"Fx|Modulation",FULL_VERSION_STR,kVstVersionString,RingModProcessor::createInstance)
+DEF_CLASS2(INLINE_UID_FROM_FUID(kControllerUID),PClassInfo::kManyInstances,kVstComponentControllerClass,stringPluginName " Controller",0,"",FULL_VERSION_STR,kVstVersionString,RingModController::createInstance)
+END_FACTORY

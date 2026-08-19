@@ -1,4 +1,4 @@
-name: LVS Plugins - Windows Build
+name: LVS Audio Suite - Windows Build
 
 on:
   push:
@@ -29,35 +29,38 @@ jobs:
           -G "Visual Studio 17 2022" -A x64
           -DSMTG_CREATE_PLUGIN_LINK=OFF
 
-      - name: Build Release
-        run: >-
-          cmake --build build/lvs-plugins --config Release
-          --target LVSEqualizer LVSCompressor LVSDelay LVSReverb --parallel
+      - name: Build and validate Release
+        run: cmake --build build/lvs-plugins --config Release --parallel
 
       - name: Package Windows VST3 suite
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist/package | Out-Null
-          $names = @(
-            'LVSEqualizer.vst3',
-            'LVSCompressor.vst3',
-            'LVSDelay.vst3',
-            'LVSReverb.vst3'
-          )
-          foreach ($name in $names) {
-            $plugin = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter $name | Select-Object -First 1
-            if (-not $plugin) { throw "$name was not produced" }
+
+          $plugins = Get-ChildItem -Path build/lvs-plugins -Recurse -Directory -Filter 'LVS*.vst3' |
+            Group-Object Name |
+            ForEach-Object { $_.Group | Select-Object -First 1 } |
+            Sort-Object Name
+
+          if ($plugins.Count -ne 24) {
+            Write-Host "Found $($plugins.Count) LVS VST3 bundles:"
+            $plugins | ForEach-Object { Write-Host "  $($_.Name)" }
+            throw "Expected exactly 24 LVS VST3 bundles"
+          }
+
+          foreach ($plugin in $plugins) {
             Copy-Item -Path $plugin.FullName -Destination dist/package -Recurse
+            Write-Host "Collected $($plugin.Name)"
           }
 
           Copy-Item -Path lvs-plugins/THIRD_PARTY_NOTICES.md -Destination dist/package
-          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Essentials-Windows-x64.zip -Force
+          Compress-Archive -Path dist/package/* -DestinationPath dist/LVS-Audio-Suite-Windows-x64.zip -Force
 
       - name: Upload Windows VST3 suite
         uses: actions/upload-artifact@v4
         with:
-          name: LVS-Essentials-Windows-x64
-          path: dist/LVS-Essentials-Windows-x64.zip
+          name: LVS-Audio-Suite-Windows-x64
+          path: dist/LVS-Audio-Suite-Windows-x64.zip
           if-no-files-found: error
 
       - name: Publish PR test pre-release
@@ -66,16 +69,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "lvs-v0.1.0-pr${{ github.event.pull_request.number }}-test"
+          $tag = "lvs-v0.2.0-pr${{ github.event.pull_request.number }}-test"
           $sha = "${{ github.event.pull_request.head.sha }}"
-          $title = "LVS Essentials PR #${{ github.event.pull_request.number }} test"
-          $notes = "Automated Windows x64 test build from PR #${{ github.event.pull_request.number }} at commit $sha. Pre-release for manual LVS/VST3 smoke testing only."
+          $title = "LVS Audio Suite PR #${{ github.event.pull_request.number }} test"
+          $notes = "Automated Windows x64 test build containing all 24 LVS VST3 effects from PR #${{ github.event.pull_request.number }} at commit $sha. Pre-release for manual LVS/VST3 smoke testing only."
 
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
             gh api --method PATCH "repos/${{ github.repository }}/git/refs/tags/$tag" -f sha="$sha" -F force=true
-            gh release upload $tag dist/LVS-Essentials-Windows-x64.zip --clobber
+            gh release upload $tag dist/LVS-Audio-Suite-Windows-x64.zip --clobber
             gh release edit $tag --prerelease --title $title --notes $notes
           } else {
-            gh release create $tag dist/LVS-Essentials-Windows-x64.zip --target $sha --prerelease --title $title --notes $notes
+            gh release create $tag dist/LVS-Audio-Suite-Windows-x64.zip --target $sha --prerelease --title $title --notes $notes
           }
