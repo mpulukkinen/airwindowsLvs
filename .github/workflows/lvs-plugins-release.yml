@@ -2,9 +2,18 @@ name: LVS Audio Suite - Windows Release
 
 on:
   push:
+    branches:
+      - master
     tags:
       - 'lvs-v*'
+    paths:
+      - '.github/LVS_RELEASE_TAG'
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (for example lvs-v0.2.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,6 +25,49 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve release tag
+        id: release
+        shell: pwsh
+        run: |
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $tag = "${{ github.ref_name }}"
+          } elseif ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $tag = "${{ inputs.release_tag }}"
+          } else {
+            $tag = (Get-Content ".github/LVS_RELEASE_TAG" -Raw).Trim()
+          }
+
+          if ($tag -notmatch '^lvs-v\d+\.\d+\.\d+$') {
+            throw "Invalid release tag '$tag'. Expected lvs-vMAJOR.MINOR.PATCH"
+          }
+
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          Write-Host "Release tag: $tag"
+
+      - name: Create release tag
+        if: github.ref_type != 'tag'
+        shell: pwsh
+        run: |
+          $tag = "${{ steps.release.outputs.tag }}"
+          $expected = "${{ github.sha }}"
+          $existing = git ls-remote --tags origin "refs/tags/$tag"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to query existing tag $tag"
+          }
+
+          if ($existing) {
+            $actual = ($existing -split '\s+')[0]
+            if ($actual -ne $expected) {
+              throw "Tag $tag already exists at $actual instead of $expected"
+            }
+            Write-Host "Tag $tag already points at $expected"
+          } else {
+            git tag $tag $expected
+            git push origin "refs/tags/$tag"
+            Write-Host "Created tag $tag at $expected"
+          }
 
       - name: Configure
         run: >-
@@ -58,15 +110,16 @@ jobs:
           if-no-files-found: error
 
       - name: Create or update GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = "${{ github.ref_name }}"
+          $tag = "${{ steps.release.outputs.tag }}"
+          $version = $tag -replace '^lvs-', ''
+
           gh release view $tag *> $null
           if ($LASTEXITCODE -eq 0) {
             gh release upload $tag dist/LVS-Audio-Suite-Windows-x64.zip --clobber
           } else {
-            gh release create $tag dist/LVS-Audio-Suite-Windows-x64.zip --generate-notes --title "LVS Audio Suite $tag"
+            gh release create $tag dist/LVS-Audio-Suite-Windows-x64.zip --generate-notes --title "LVS Audio Suite $version"
           }
